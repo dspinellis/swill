@@ -11,7 +11,7 @@
  * See the file LICENSE for information on usage and redistribution.	
  * ----------------------------------------------------------------------------- */
 
-static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/handlers.c,v 1.1 2003/06/23 08:55:25 dds Exp $";
+static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/handlers.c,v 1.2 2003/06/23 08:55:57 dds Exp $";
 
 #include "swillint.h"
 #include <stdarg.h>
@@ -365,7 +365,7 @@ swill_getargs(const char *fmt, ...) {
       break;
 
     case 'p':
-      *((void **) ptr) = (void *) strtoul(value, NULL, 0);
+      sscanf(value, "%p", (void **)ptr);
       break;
 
     default:
