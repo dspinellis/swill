@@ -10,14 +10,16 @@
  * See the file LICENSE for information on usage and redistribution.	
  * ----------------------------------------------------------------------------- */
 
-static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/Objects/file.c,v 1.1 2002/11/03 11:01:32 dds Exp $";
+static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/Objects/file.c,v 1.2 2003/11/20 12:33:28 dds Exp $";
 
 #include "dohint.h"
 
 #define DOH_INTFILE  1
 
 #ifdef DOH_INTFILE
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 #endif
 
 typedef struct {
