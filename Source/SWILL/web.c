@@ -11,7 +11,7 @@
  * See the file LICENSE for information on usage and redistribution.	
  * ----------------------------------------------------------------------------- */
 
-static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/web.c,v 1.1 2002/11/03 09:14:13 dds Exp $";
+static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/web.c,v 1.2 2003/05/16 15:10:36 dds Exp $";
 
 #include "swillint.h"
 
@@ -37,6 +37,45 @@ static FILE   *SwillFile    = 0;
 
 #ifdef __USE_MPI
 static int _swill_mpi_rank, _swill_mpi_numprocs;
+#endif
+
+/*
+ * Functions to set the socket in blocking mode and return it to
+ * its previous mode.
+ */
+#ifdef WIN32
+int
+set_blocking(int fd)
+{
+  unsigned long val = 1;
+  ioctlsocket(fd, FIONBIO, &val);
+  return 0;
+}
+
+void
+restore_blocking(int fd, int v)
+{
+  unsigned long val = v;
+  ioctlsocket(fd, FIONBIO, &val);
+}
+
+#else
+int
+set_blocking(int fd)
+{
+  int val;
+
+  val = fcntl(fd, F_GETFL, 0);
+  fcntl(fd, F_SETFL, val | O_NONBLOCK);
+  return val;
+}
+
+void
+restore_blocking(int fd, int v)
+{
+  fcntl(fd, F_SETFL, v);
+}
+
 #endif
 
 /* Global variables containing information about the current request */
@@ -130,7 +169,19 @@ swill_init(int port) {
 
 #endif
 
+#ifdef WIN32
+  {
+  WORD wVersionRequested;
+  WSADATA wsaData;
+  int winSockErr;
+ 
+  wVersionRequested = MAKEWORD(2, 2);
+  winSockErr = WSAStartup(wVersionRequested, &wsaData);
+  assert(winSockErr == 0);
+  }
+#else
   signal(SIGPIPE, SIG_IGN);
+#endif
 
   DohEncoding("url",swill_url_encoder);
   DohEncoding("pre",swill_pre_encoder);
@@ -211,7 +262,7 @@ void
 swill_close() {
   if (!SwillInit) return;
   if (SwillSocket > 0) {
-    close(SwillSocket);
+    closesocket(SwillSocket);
   }
   fclose(SwillFile);
   SwillFile = 0;
@@ -317,7 +368,7 @@ swill_nbwrite(int fd, char *buffer, int len) {
       swill_logprintf("   Warning: write timeout!\n");
       return nsent;
     }
-    n = write(fd,buffer+nsent,len-nsent);
+    n = send(fd,buffer+nsent,len-nsent, 0);
     if (n < 0) {
       if (errno != EWOULDBLOCK) {
 	return nsent;
@@ -368,8 +419,7 @@ swill_dump_page(File *webpage, int fd) {
   Seek(webpage,0, SEEK_SET);
 
   /* Put the socket in non-blocking I/O mode */
-  val = fcntl(fd, F_GETFL, 0);
-  fcntl(fd, F_SETFL, val | O_NONBLOCK);
+  val = set_blocking(fd);
   
   tmp = NewStringf("HTTP/1.0 %s\n", http_response);
   
@@ -398,14 +448,12 @@ swill_dump_page(File *webpage, int fd) {
   
   swill_nbcopydata(webpage,fd);
 
+  if (0)
+    send_error: nbytes = 0;
   /* Restore flags */
-  fcntl(fd, F_SETFL, val);
+  restore_blocking(fd, val);
   if (tmp) Delete(tmp);
   return nbytes;
- send_error:
-  if (tmp) Delete(tmp);
-  fcntl(fd, F_SETFL,val);
-  return 0;
 }
 
 /* -----------------------------------------------------------------------------
@@ -475,10 +523,9 @@ swill_serve_file(String *uri, File *out, int clientfd) {
     swill_dump_page(out,clientfd);
     
     {
-      int val = fcntl(clientfd, F_GETFL,0);
-      fcntl(clientfd, F_SETFL, val | O_NONBLOCK);
+      int val = set_blocking(clientfd);
       swill_nbcopydata(f,clientfd);
-      fcntl(clientfd, F_SETFL, val);
+      restore_blocking(clientfd, val);
     }
     fclose(f);
     Delete(filename);
@@ -674,10 +721,9 @@ swill_serve_one(struct sockaddr_in *clientaddr, int clientfd)
 	SetInt(http_out_headers,"Content-Length",info.st_size);
 	swill_dump_page(out,clientfd);
 	{
-	  int val = fcntl(clientfd, F_GETFL,0);
-	  fcntl(clientfd, F_SETFL, val | O_NONBLOCK);
+	  int val = set_blocking(clientfd);
 	  swill_nbcopydata(f,clientfd);
-	  fcntl(clientfd, F_SETFL, val);
+	  restore_blocking(clientfd, val);
 	}
 	fclose(f);
 	out = 0;
@@ -740,7 +786,7 @@ swill_serve() {
   out = swill_serve_one(&clientaddr,clientfd);
   if (!out) {
     /* swill_serve_one() took care of everything.  Goodbye */
-    close(clientfd);
+    closesocket(clientfd);
     return 1;
   } else {
     SwillHandler  whandle;
@@ -779,7 +825,7 @@ swill_serve() {
     Delete(current_request);
     Delete(http_out_headers);
   }
-  close(clientfd);
+  closesocket(clientfd);
   return 1;
 }
 
@@ -815,7 +861,7 @@ swill_serve() {
     
     out = swill_serve_one(&clientaddr,clientfd);
     if (!out) {
-      close(clientfd);
+      closesocket(clientfd);
       request = 0;
       goto bcast_serve;
     } else {
@@ -932,7 +978,7 @@ swill_serve() {
       if( _swill_mpi_rank == 0){
         swill_dump_page(tmp_out_string, clientfd);
 	Delete(tmp_out_string);
-        close(clientfd);
+        closesocket(clientfd);
       }
     }
     if(!_swill_mpi_rank == 0)

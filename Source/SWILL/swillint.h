@@ -17,15 +17,35 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/time.h>
+#include <time.h>
 #include <sys/types.h>
+#if defined(WIN32) || defined(_WIN32)
+#include <winsock.h>
+
+#define EWOULDBLOCK WSAEWOULDBLOCK
+#define EINTR WSAEINTR
+#ifdef errno
+#undef errno
+#endif
+#define errno WSAGetLastError()
+#define bzero(b, l) memset(b, 0, l)
+#define lstat(f, s) stat(f, s)
+#define ftruncate(fd, len) _chsize(fd, len)
+#ifndef S_ISDIR
+#define S_ISDIR(x) ((x) & _S_IFDIR)
+#endif
+
+#else
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include <unistd.h>
+
+#define closesocket(fd) close(fd)
+#endif
 #include <sys/stat.h>
 #include <ctype.h>
-#include <unistd.h>
 #include <time.h>
 #include <signal.h>
 

@@ -10,7 +10,7 @@
  * See the file LICENSE for information on usage and redistribution.	
  * ----------------------------------------------------------------------------- */
 
-static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/parse.c,v 1.1 2002/11/03 10:28:42 dds Exp $";
+static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/parse.c,v 1.2 2003/05/16 15:10:36 dds Exp $";
 
 #include "swillint.h"
 
@@ -53,7 +53,7 @@ swill_read_rawrequest(int fd, String **request, String **excess)
       swill_logprintf("Request read timeout! ");
       return 0;
     }
-    len = read(fd, buffer+buf_in, SWILL_MAX_HEADER-buf_in);
+    len = recv(fd, buffer+buf_in, SWILL_MAX_HEADER-buf_in, 0);
     if (len <= 0) {
       if (errno == EINTR) continue;
       else return 0;       /* Read error. Failure!! */
@@ -135,7 +135,7 @@ swill_read_post(int fd, int length, String *excess)
       Delete(post);
       return 0;
     }
-    rlen = read(fd,buffer,8192);
+    rlen = recv(fd,buffer,8192, 0);
     if (rlen <= 0) {
       if (errno == EINTR) continue;
       Delete(post);
