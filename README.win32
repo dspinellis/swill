@@ -1,0 +1,41 @@
+Notes on the SWILL Win32 Port
+
+I compiled and tested SWILL under Win32.  Hopefully by the time
+you read this the changes will be integrated into the SWILL source
+code.
+
+The port involves:
+- Changes in web.c to make socket initialization, blocking, and closing
+  compatible with the WINSOCK API.
+- All socket read/write calls were changed to send/recv to be compatible
+  with the WINSOCK API. (web.c, parse.c)
+- A thin compatibility layer introduced in swillint.h to handle
+  errno, bzero, lstat, S_ISDIR, and ftruncate.
+- Makefiles for the SWILL directory.
+- Minimal testing (verify that simple.c can serve a page locally and over the
+  network)
+- No work on providing a shared library as a DLL
+
+The port was tested using:
+- Visual C/C++ 5.0 Microsoft C Version 11.00.7022 for 80x86
+- mingw: gcc version 3.2 (mingw special 20020817-1)
+
+To compile and test under mingw:
+- run gcc -c *.c in source/objects
+- run make -f makefile.mingw in source/swill
+- run gcc -g simple.c -I..\include -L.. -lswill -lws2_32 in examples
+
+To compile and test under Visual C:
+- run cl -c *.c in source/objects
+- run nmake /f makefile.msc in source/swill
+- run cl -Zi simple.c -I..\include ..\swill.lib ws2_32.lib in examples
+
+Under Visual C the compiler may complain about a missing unistd.h file
+when compiling in source/objects and in examples.  Either add an empty
+one in your include directory or remove the offending line.
+
+- Other changes:
+- handlers.c portability enhancement for 64-bit architectures
+- web.c Added char *swill_getpeerip(const char *name) function.
+
+Diomidis Spinellis, November 2002

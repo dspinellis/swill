@@ -1,0 +1,5 @@
+*.o
+*.tar.gz
+config.*
+configure
+Makefile

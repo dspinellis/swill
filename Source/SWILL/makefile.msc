@@ -1,0 +1,54 @@
+# Generated automatically from Makefile.in by configure.
+#######################################################################
+# $Header: /cvs/projects/SWILL/Source/SWILL/Makefile.in,v 1.15 2002/03/19 19:51:34 beazley Exp $
+#######################################################################
+
+srcdir = .
+
+#.KEEP_STATE:
+
+CC      = cl
+#CCSHARED= -fpic
+prefix  = /usr/local
+RANLIB  = ranlib
+AR      = ar
+SO      = .so
+LDSHARED= ld -Bshareable
+NETLIBS = 
+
+########################################################################
+# Normally, you shouldn't have to change anything below this point     #
+########################################################################
+
+LIBOBJS = log.obj io.obj encoding.obj handlers.obj mime.obj parse.obj web.obj security.obj
+LIBSRCS = log.c io.c encoding.c handlers.c mime.c parse.c web.c security.c
+
+DOHOBJS = ..\Objects\*.obj
+LIBHEADERS = $(srcdir)/../Include/swill.h
+LIB        = libswill$(SO)
+SLIB       = swill.lib
+IPATH    = -I$(srcdir)/../../Include -I$(srcdir)/../Objects 
+#CFLAGS     = -Zi
+SHELL      = /bin/sh
+
+#
+# Rules for creation of a .obj file from .cxx
+.SUFFIXES: .c
+.c.obj:
+	$(CC) $(CCSHARED) $(IPATH) $(CFLAGS) -c -o $*.obj $<
+
+all: static
+
+static: $(LIBOBJS)
+	@echo "Building static library"
+	lib /out:$(SLIB) $(LIBOBJS) $(DOHOBJS)
+	copy /y $(SLIB) ..\..
+
+clean::
+	rm -f *.o $(LIB) ../$(LIB) $(SLIB)
+
+nuke::
+	rm -f Makefile *~ #* core a.out
+
+
+

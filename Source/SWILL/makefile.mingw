@@ -1,0 +1,59 @@
+# Generated automatically from Makefile.in by configure.
+#######################################################################
+# $Header: /dds/src/port/swill.RCS/Source/SWILL/makefile.mingw,v 1.1 2009/03/16 10:00:28 dds Exp $
+#######################################################################
+
+srcdir = .
+
+#.KEEP_STATE:
+
+CC      = gcc
+#CCSHARED= -fpic
+prefix  = /usr/local
+RANLIB  = ranlib
+AR      = ar
+SO      = .so
+LDSHARED= ld -Bshareable
+NETLIBS = 
+
+########################################################################
+# Normally, you shouldn't have to change anything below this point     #
+########################################################################
+
+LIBOBJS = log.o io.o encoding.o handlers.o mime.o parse.o web.o security.o
+LIBSRCS = log.c io.c encoding.c handlers.c mime.c parse.c web.c security.c
+
+DOHOBJS = ../Objects/*.o
+LIBHEADERS = $(srcdir)/../Include/swill.h
+LIB        = libswill$(SO)
+SLIB       = libswill.a
+INCLUDE    = -I$(srcdir)/../../Include -I$(srcdir)/../Objects 
+CFLAGS     = -DWIN32
+SHELL      = /bin/sh
+
+#
+# Rules for creation of a .o file from .cxx
+.SUFFIXES: .c
+.c.o:
+	$(CC) $(CCSHARED) $(INCLUDE) $(CFLAGS) -c -o $*.o $<
+
+all: static
+
+static: $(LIBOBJS)
+	@echo "Building static library"
+	$(AR) cr $(SLIB) $(LIBOBJS) $(DOHOBJS)
+	cp -f $(SLIB) ../..
+
+shared: $(LIBOBJS)
+	@echo "Building shared library"
+	$(LDSHARED) $(LIBOBJS) $(DOHOBJS) -o $(LIB) $(NETLIBS)
+	cp -f $(LIB) ../..
+
+clean::
+	rm -f *.o $(LIB) ../$(LIB) $(SLIB)
+
+nuke::
+	rm -f Makefile *~ #* core a.out
+
+
+

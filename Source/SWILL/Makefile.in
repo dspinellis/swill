@@ -1,0 +1,59 @@
+#######################################################################
+# $Header: /cvs/projects/SWILL/Source/SWILL/Makefile.in,v 1.15 2002/03/19 19:51:34 beazley Exp $
+#######################################################################
+
+srcdir = @srcdir@
+VPATH  = @srcdir@
+
+#.KEEP_STATE:
+
+CC      = @CC@
+CCSHARED= @CCSHARED@
+prefix  = @prefix@
+RANLIB  = @RANLIB@
+AR      = @AR@
+SO      = @SO@
+LDSHARED= @LDSHARED@
+NETLIBS = @NETLIBS@
+
+########################################################################
+# Normally, you shouldn't have to change anything below this point     #
+########################################################################
+
+LIBOBJS = log.o io.o encoding.o handlers.o mime.o parse.o web.o security.o
+LIBSRCS = log.c io.c encoding.c handlers.c mime.c parse.c web.c security.c
+
+DOHOBJS = ../Objects/*.o
+LIBHEADERS = $(srcdir)/../Include/swill.h
+LIB        = libswill@MPISUFFIX@$(SO)
+SLIB       = libswill@MPISUFFIX@.a
+INCLUDE    = -I$(srcdir)/../../Include -I$(srcdir)/../Objects @MPIINCLUDE@
+CFLAGS     = @USEMPI@
+SHELL      = /bin/sh
+
+#
+# Rules for creation of a .o file from .cxx
+.SUFFIXES: .c
+.c.o:
+	$(CC) $(CCSHARED) $(INCLUDE) $(CFLAGS) -c -o $*.o $<
+
+all: static shared
+
+static: $(LIBOBJS)
+	@echo "Building static library"
+	$(AR) cr $(SLIB) $(LIBOBJS) $(DOHOBJS)
+	cp -f $(SLIB) ../..
+
+shared: $(LIBOBJS)
+	@echo "Building shared library"
+	$(LDSHARED) $(LIBOBJS) $(DOHOBJS) -o $(LIB) $(NETLIBS)
+	cp -f $(LIB) ../..
+
+clean::
+	rm -f *.o $(LIB) ../$(LIB) $(SLIB)
+
+nuke::
+	rm -f Makefile *~ #* core a.out
+
+
+
