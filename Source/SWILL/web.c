@@ -11,7 +11,7 @@
  * See the file LICENSE for information on usage and redistribution.	
  * ----------------------------------------------------------------------------- */
 
-static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/web.c,v 1.2 2003/05/16 15:10:36 dds Exp $";
+static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/web.c,v 1.3 2003/06/23 09:03:47 dds Exp $";
 
 #include "swillint.h"
 
@@ -137,6 +137,10 @@ double swill_getdouble(const char *name) {
     return GetDouble(query,name);
   }
   return 0;
+}
+
+char *swill_getpeerip(const char *name) {
+  return Char(Getattr(current_request,"peername"));
 }
 
 /* -----------------------------------------------------------------------------
