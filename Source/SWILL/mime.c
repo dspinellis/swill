@@ -10,7 +10,7 @@
  * See the file LICENSE for information on usage and redistribution.	
  * ----------------------------------------------------------------------------- */
 
-static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/mime.c,v 1.2 2004/07/30 06:25:10 dds Exp $";
+static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/mime.c,v 1.3 2008/06/15 21:03:00 dds Exp $";
 
 #include "swillint.h"
 
@@ -29,7 +29,7 @@ static MimeType  types[] = {
   {"rgb",  "image/rgb"},
   {"png",  "image/png"},
   {"pdf",  "application/pdf"},
-  {"svg",  "application/svg"},
+  {"svg",  "image/svg+xml"},
   { 0, 0},
 };
 
