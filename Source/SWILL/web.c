@@ -11,7 +11,7 @@
  * See the file LICENSE for information on usage and redistribution.	
  * ----------------------------------------------------------------------------- */
 
-static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/web.c,v 1.5 2008/07/03 06:16:17 dds Exp $";
+static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/web.c,v 1.6 2008/07/03 14:34:42 dds Exp $";
 
 #include "swillint.h"
 
@@ -34,6 +34,8 @@ static String *SwillDocroot = 0;
        int     SwillTimeout = SWILL_TIMEOUT;
 
 static FILE   *SwillFile    = 0;
+
+static int ForkingServer = 0;
 
 #ifdef __USE_MPI
 static int _swill_mpi_rank, _swill_mpi_numprocs;
@@ -170,7 +172,7 @@ swill_init(int port) {
 
   assert(!SwillInit);
 
-  if (!SwillFile) {
+  if (!SwillFile && !ForkingServer) {
     SwillFile = tmpfile();
     assert(SwillFile);
   }
@@ -283,8 +285,10 @@ swill_close() {
   if (SwillSocket > 0) {
     closesocket(SwillSocket);
   }
-  fclose(SwillFile);
-  SwillFile = 0;
+  if (SwillFile) {
+    fclose(SwillFile);
+    SwillFile = 0;
+  }
   Delete(SwillTitle);
   Delete(SwillDocroot);
   SwillSocket = 0;
@@ -684,7 +688,10 @@ swill_serve_one(struct sockaddr_in *clientaddr, int clientfd)
   swill_setresponse("200 OK");
 
   /* Create an output object */
-  out = SwillFile;
+  if (SwillFile)
+    out = SwillFile;
+  else
+    out = tmpfile();
   ftruncate(fileno(out),0);
   fseek(out,0, SEEK_SET);
 
@@ -784,11 +791,30 @@ handled_request:
 
 
 #ifndef __USE_MPI
+
+#ifndef WIN32
+int
+swill_setfork()
+{
+  /*
+   * Many OS's will not create zombie processes after this.
+   * Checked for: FreeBSD, Mac OS X, SunOS 5.10, Linux 2.6
+   */
+  signal(SIGCHLD, SIG_IGN);
+  if (SwillFile) {
+    fclose(SwillFile);
+    SwillFile = 0;
+  }
+  ForkingServer = 1;
+}
+#endif
+
 int
 swill_serve() {
   struct sockaddr_in clientaddr;
   int clientfd, len = sizeof(clientaddr);
   int oldstdout;
+  int pid;
 
   FILE *out = 0;
   if (!SwillInit) {
@@ -800,11 +826,30 @@ swill_serve() {
   clientfd = accept(SwillSocket, (struct sockaddr *) &clientaddr, &len);
   if (clientfd < 0) return 0;
 
+#ifndef WIN32
+  if (ForkingServer)
+    switch (pid = fork()) {
+    case -1:	/* Failure */
+      return 0;
+    case 0:	/* Child */
+      signal(SIGCHLD, SIG_DFL);
+      close(SwillSocket);
+      break;
+    default:	/* Parent */
+      closesocket(clientfd);
+      return;
+    }
+#endif
+
   /* Go process request */
     
   out = swill_serve_one(&clientaddr,clientfd);
   if (!out) {
     /* swill_serve_one() took care of everything.  Goodbye */
+    if (ForkingServer) {
+      shutdown(clientfd, SHUT_WR);	/* Deliver pending data */
+      exit(0);
+    }
     closesocket(clientfd);
     return 1;
   } else {
@@ -843,6 +888,10 @@ swill_serve() {
     /* Delete the other fields */
     Delete(current_request);
     Delete(http_out_headers);
+  }
+  if (ForkingServer) {
+    shutdown(clientfd, SHUT_WR);	/* Deliver pending data */
+    exit(0);
   }
   closesocket(clientfd);
   return 1;
@@ -939,7 +988,10 @@ swill_serve() {
       assert(whandle);
       
       /* Create an output object */
-      out = SwillFile;
+      if (SwillFile)
+	out = SwillFile;
+      else
+	out = tmpfile();
       ftruncate(fileno(out),0);
       fseek(out,0, SEEK_SET);
 
