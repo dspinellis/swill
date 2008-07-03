@@ -11,7 +11,7 @@
  * See the file LICENSE for information on usage and redistribution.	
  * ----------------------------------------------------------------------------- */
 
-static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/web.c,v 1.6 2008/07/03 14:34:42 dds Exp $";
+static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/web.c,v 1.7 2008/07/03 14:46:43 dds Exp $";
 
 #include "swillint.h"
 
@@ -633,10 +633,14 @@ swill_serve_one(struct sockaddr_in *clientaddr, int clientfd)
     time_t t;
     struct tm *tms;
     char ts[256];
+    char *qs;
     t = time(NULL);
     tms = localtime(&t);
     strftime(ts,64,"[%d %b %y %H:%M:%S]", tms);
-    swill_logprintf("%s %s %s\n", ts, method, Getattr(request,"uri"));
+    if ((qs = Getattr(request,"querystring")))
+      swill_logprintf("%s %s %s?%s\n", ts, method, Getattr(request,"uri"), qs);
+    else
+      swill_logprintf("%s %s %s\n", ts, method, Getattr(request,"uri"));
   }
 
   Setattr(request,"peername", peerip);
