@@ -11,7 +11,7 @@
  * See the file LICENSE for information on usage and redistribution.	
  * ----------------------------------------------------------------------------- */
 
-static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/web.c,v 1.4 2004/04/11 19:37:53 dds Exp $";
+static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/web.c,v 1.5 2008/07/03 06:16:17 dds Exp $";
 
 #include "swillint.h"
 
@@ -151,6 +151,11 @@ int swill_getrlen(void) {
 char *swill_getrequest(void) {
   String *requeststring = Getattr(current_request,"request");
   return Char(requeststring);
+}
+
+char *swill_getquerystring(void) {
+  String *querystring = Getattr(current_request,"querystring");
+  return Char(querystring);
 }
 
 /* -----------------------------------------------------------------------------
