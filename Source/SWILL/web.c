@@ -11,7 +11,7 @@
  * See the file LICENSE for information on usage and redistribution.	
  * ----------------------------------------------------------------------------- */
 
-static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/web.c,v 1.7 2008/07/03 14:46:43 dds Exp $";
+static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/web.c,v 1.8 2008/07/04 06:26:20 dds Exp $";
 
 #include "swillint.h"
 
@@ -852,7 +852,16 @@ swill_serve() {
     /* swill_serve_one() took care of everything.  Goodbye */
     if (ForkingServer) {
       shutdown(clientfd, SHUT_WR);	/* Deliver pending data */
-      exit(0);
+      /*
+       * According to the C++ standard exit() will call all destructors
+       * for statically initialized objects.  Due to the copy on write
+       * implementation of modern forks, exit can be the time when we
+       * pay the fork's cost, and in C++ applications with a large memory
+       * image this can be prohibitevely expensive.  _exit doesn't involve
+       * the runtime library and avoids this cost.  However, flushing of
+       * streams and not relying on atexit is our responsibility.
+       */
+      _exit(0);
     }
     closesocket(clientfd);
     return 1;
@@ -895,7 +904,7 @@ swill_serve() {
   }
   if (ForkingServer) {
     shutdown(clientfd, SHUT_WR);	/* Deliver pending data */
-    exit(0);
+    exit(0);				/* See comment on the previous exit */
   }
   closesocket(clientfd);
   return 1;
