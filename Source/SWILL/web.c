@@ -11,7 +11,7 @@
  * See the file LICENSE for information on usage and redistribution.	
  * ----------------------------------------------------------------------------- */
 
-static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/web.c,v 1.8 2008/07/04 06:26:20 dds Exp $";
+static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/web.c,v 1.9 2008/07/04 06:27:27 dds Exp $";
 
 #include "swillint.h"
 
@@ -850,6 +850,7 @@ swill_serve() {
   out = swill_serve_one(&clientaddr,clientfd);
   if (!out) {
     /* swill_serve_one() took care of everything.  Goodbye */
+#ifndef WIN32
     if (ForkingServer) {
       shutdown(clientfd, SHUT_WR);	/* Deliver pending data */
       /*
@@ -863,6 +864,7 @@ swill_serve() {
        */
       _exit(0);
     }
+#endif
     closesocket(clientfd);
     return 1;
   } else {
@@ -902,10 +904,12 @@ swill_serve() {
     Delete(current_request);
     Delete(http_out_headers);
   }
+#ifndef WIN32
   if (ForkingServer) {
     shutdown(clientfd, SHUT_WR);	/* Deliver pending data */
-    exit(0);				/* See comment on the previous exit */
+    _exit(0);				/* See comment on the previous exit */
   }
+#endif
   closesocket(clientfd);
   return 1;
 }
