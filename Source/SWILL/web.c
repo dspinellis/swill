@@ -11,7 +11,7 @@
  * See the file LICENSE for information on usage and redistribution.	
  * ----------------------------------------------------------------------------- */
 
-static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/web.c,v 1.9 2008/07/04 06:27:27 dds Exp $";
+static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/web.c,v 1.10 2008/07/15 16:45:43 dds Exp $";
 
 #include "swillint.h"
 
@@ -797,7 +797,7 @@ handled_request:
 #ifndef __USE_MPI
 
 #ifndef WIN32
-int
+void
 swill_setfork()
 {
   /*
