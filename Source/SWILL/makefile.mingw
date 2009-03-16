@@ -1,13 +1,13 @@
 # Generated automatically from Makefile.in by configure.
 #######################################################################
-# $Header: /dds/src/port/swill.RCS/Source/SWILL/makefile.mingw,v 1.1 2009/03/16 10:00:28 dds Exp $
+# $Header: /dds/src/port/swill.RCS/Source/SWILL/makefile.mingw,v 1.2 2009/03/16 10:13:46 dds Exp $
 #######################################################################
 
 srcdir = .
 
 #.KEEP_STATE:
 
-CC      = gcc
+CC      = gcc-4
 #CCSHARED= -fpic
 prefix  = /usr/local
 RANLIB  = ranlib
@@ -28,7 +28,7 @@ LIBHEADERS = $(srcdir)/../Include/swill.h
 LIB        = libswill$(SO)
 SLIB       = libswill.a
 INCLUDE    = -I$(srcdir)/../../Include -I$(srcdir)/../Objects 
-CFLAGS     = -DWIN32
+CFLAGS     = 
 SHELL      = /bin/sh
 
 #
