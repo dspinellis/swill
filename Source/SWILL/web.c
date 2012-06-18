@@ -11,7 +11,7 @@
  * See the file LICENSE for information on usage and redistribution.	
  * ----------------------------------------------------------------------------- */
 
-static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/web.c,v 1.10 2008/07/15 16:45:43 dds Exp $";
+static char cvsroot[] = "$Header: /dds/src/port/swill.RCS/Source/SWILL/web.c,v 1.11 2012/06/18 11:34:03 dds Exp $";
 
 #include "swillint.h"
 
@@ -45,7 +45,7 @@ static int _swill_mpi_rank, _swill_mpi_numprocs;
  * Functions to set the socket in blocking mode and return it to
  * its previous mode.
  */
-#ifdef WIN32
+#if defined(WIN32) && !defined(__CYGWIN__)
 int
 set_blocking(int fd)
 {
@@ -190,7 +190,7 @@ swill_init(int port) {
 
 #endif
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(__CYGWIN__)
   {
   WORD wVersionRequested;
   WSADATA wsaData;

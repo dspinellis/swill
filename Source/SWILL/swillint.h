@@ -19,7 +19,7 @@
 #include <string.h>
 #include <time.h>
 #include <sys/types.h>
-#if defined(WIN32) || defined(_WIN32)
+#if (defined(WIN32) || defined(_WIN32)) && !defined(fd_set)
 #include <winsock.h>
 
 #define EWOULDBLOCK WSAEWOULDBLOCK
