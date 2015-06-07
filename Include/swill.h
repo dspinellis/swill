@@ -61,7 +61,9 @@ extern int     swill_vprintf(const char *fmt, va_list ap);
 extern int     swill_logprintf(const char *fmt, ...);
 extern void    swill_printurl(FILE *f, const char *url, const char *fmt, ...);
 
+extern char   *swill_getpeerip(void);
 extern void    swill_netscape(const char *url);
+extern void    swill_setfork();
 
 #ifndef _SWILLINT_H
 #define swill_handle(x,y,z) swill_handle(x, SH(y), (void *) z)
