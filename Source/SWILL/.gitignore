@@ -1,2 +1,3 @@
 Makefile
 .deps
+libswill.a

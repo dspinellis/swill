@@ -3,3 +3,5 @@
 config.*
 configure
 Makefile
+libswill.a
+RCS-frozen
