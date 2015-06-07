@@ -1,6 +1,8 @@
 #include "swill.h"
 #include <stdio.h>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 
 void foo() {
   int i;
