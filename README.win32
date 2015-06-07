@@ -25,6 +25,11 @@ To compile and test under mingw:
 - run make -f makefile.mingw in source/swill
 - run gcc -g simple.c -I..\include -L.. -lswill -lws2_32 in examples
 
+To compile and test under cygwin:
+- run ./configure
+- run make
+
+
 To compile and test under Visual C:
 - run cl -c *.c in source/objects
 - run nmake /f makefile.msc in source/swill
