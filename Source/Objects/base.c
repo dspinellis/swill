@@ -94,7 +94,7 @@ DohStr(const DOH *obj) {
     if (objinfo->doh_str) {
       return (objinfo->doh_str)(b);
     }
-    sprintf(buffer,"<Object '%s' at %x>", objinfo->objname, b);
+    sprintf(buffer,"<Object '%s' at %p>", objinfo->objname, b);
     return NewString(buffer);
   } else {
     return NewString(obj);
@@ -244,6 +244,7 @@ DohDelattr(DOH *obj, const DOH *name) {
   if (objinfo->doh_hash && objinfo->doh_hash->doh_delattr) {
     return (objinfo->doh_hash->doh_delattr)(b,(DOH *) name);
   }
+  return 0;
 }
 
 /* -----------------------------------------------------------------------------

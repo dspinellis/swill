@@ -250,7 +250,7 @@ swill_init(int port) {
     /* Get port assigned to the socket */
     {
       struct  sockaddr_in  socketname;
-      int     inlen = sizeof(socketname);
+      socklen_t     inlen = sizeof(socketname);
       if (getsockname(SwillSocket, (struct sockaddr *) &socketname,  &inlen) >= 0) {
 	SwillPort = ntohs(socketname.sin_port);
       }
@@ -422,6 +422,8 @@ swill_nbcopydata(FILE *in, int fd) {
     }
     total += nread;
   }
+  return 0;
+  /* NOTREACHED */
 }
 
 /* -----------------------------------------------------------------------------
@@ -816,7 +818,8 @@ swill_setfork()
 int
 swill_serve() {
   struct sockaddr_in clientaddr;
-  int clientfd, len = sizeof(clientaddr);
+  int clientfd;
+  socklen_t len = sizeof(clientaddr);
   int oldstdout;
   int pid;
 
@@ -841,7 +844,7 @@ swill_serve() {
       break;
     default:	/* Parent */
       closesocket(clientfd);
-      return;
+      return 1;
     }
 #endif
 
