@@ -39,15 +39,19 @@ SHELL      = /bin/sh
 
 all: static shared
 
-static: $(LIBOBJS)
+$(SLIB): $(LIBOBJS)
 	@echo "Building static library"
 	$(AR) cr $(SLIB) $(LIBOBJS) $(DOHOBJS)
 	cp -f $(SLIB) ../..
 
-shared: $(LIBOBJS)
+($LIB): $(LIBOBJS)
 	@echo "Building shared library"
 	$(LDSHARED) $(LIBOBJS) $(DOHOBJS) -o $(LIB) $(NETLIBS)
 	cp -f $(LIB) ../..
+
+static: $(SLIB)
+
+shared: $(LIB)
 
 clean::
 	rm -f *.o $(LIB) ../$(LIB) $(SLIB)
