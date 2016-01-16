@@ -1,3 +1,4 @@
 Makefile
 .deps
 libswill.a
+libswill.so

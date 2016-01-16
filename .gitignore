@@ -4,3 +4,4 @@ config.*
 Makefile
 libswill.a
 RCS-frozen
+libswill.so
