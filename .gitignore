@@ -1,7 +1,6 @@
 *.o
 *.tar.gz
 config.*
-configure
 Makefile
 libswill.a
 RCS-frozen
