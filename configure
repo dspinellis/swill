@@ -646,7 +646,8 @@ cross_compiling=$ac_cv_prog_cc_cross
 cat > conftest.$ac_ext <<EOF
 #line 648 "configure"
 #include "confdefs.h"
-main(){return(0);}
+int
+main(int argc, char *argv[]){return(0);}
 EOF
 if { (eval echo configure:652: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest; then
   ac_cv_prog_cc_works=yes
@@ -926,7 +927,7 @@ else
 #define ISLOWER(c) ('a' <= (c) && (c) <= 'z')
 #define TOUPPER(c) (ISLOWER(c) ? 'A' + ((c) - 'a') : (c))
 #define XOR(e, f) (((e) && !(f)) || (!(e) && (f)))
-int main () { int i; for (i = 0; i < 256; i++)
+int main (int argc, char *argv[]) { int i; for (i = 0; i < 256; i++)
 if (XOR (islower (i), ISLOWER (i)) || toupper (i) != TOUPPER (i)) exit(2);
 exit (0); }
 
@@ -1083,7 +1084,7 @@ cat > conftest.$ac_ext <<EOF
     builtin and then its argument prototype would still apply.  */
 char dlopen();
 
-int main() {
+int main(int argc, char *argv[]) {
 dlopen()
 ; return 0; }
 EOF
@@ -1130,7 +1131,7 @@ cat > conftest.$ac_ext <<EOF
     builtin and then its argument prototype would still apply.  */
 char shl_load();
 
-int main() {
+int main(int argc, char *argv[]) {
 shl_load()
 ; return 0; }
 EOF
@@ -1187,7 +1188,7 @@ cat > conftest.$ac_ext <<EOF
     builtin and then its argument prototype would still apply.  */
 char t_open();
 
-int main() {
+int main(int argc, char *argv[]) {
 t_open()
 ; return 0; }
 EOF
@@ -1227,7 +1228,7 @@ cat > conftest.$ac_ext <<EOF
     builtin and then its argument prototype would still apply.  */
 char gethostbyname();
 
-int main() {
+int main(int argc, char *argv[]) {
 gethostbyname()
 ; return 0; }
 EOF
@@ -1267,7 +1268,7 @@ cat > conftest.$ac_ext <<EOF
     builtin and then its argument prototype would still apply.  */
 char socket();
 
-int main() {
+int main(int argc, char *argv[]) {
 socket()
 ; return 0; }
 EOF
