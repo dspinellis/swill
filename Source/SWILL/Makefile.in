@@ -44,7 +44,7 @@ $(SLIB): $(LIBOBJS)
 	$(AR) cr $(SLIB) $(LIBOBJS) $(DOHOBJS)
 	cp -f $(SLIB) ../..
 
-($LIB): $(LIBOBJS)
+$(LIB): $(LIBOBJS)
 	@echo "Building shared library"
 	$(LDSHARED) $(LIBOBJS) $(DOHOBJS) -o $(LIB) $(NETLIBS)
 	cp -f $(LIB) ../..
